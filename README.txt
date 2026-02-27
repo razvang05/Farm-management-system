@@ -1,39 +1,62 @@
-                    PROIECT BD2 - SISTEM DE GESTIUNE FERMA
+BD2 PROJECT - FARM MANAGEMENT SYSTEM
 
-CONȚINUT ARHIVĂ:
-- documentatie.pdf
-- README.txt (acest fișier)
-- docker-compose.yml
-- .env.example
-- .dockerignore
-- sql/ (00_cleanup.sql, 01_schema.sql, 02_seed.sql, 03_pkg_rapoarte.sql, 04_triggers.sql)
-- app/ (app_web.py, init_db.py, requirements.txt, Dockerfile, docker-entrypoint.sh, templates/)
-- 
+PROJECT STRUCTURE
 
-INSTRUCȚIUNI DE INSTALARE:
+documentation.pdf
+docker-compose.yml
+.env.example
+.dockerignore
 
-1. Dezarhivați arhiva și deschideți proiectul în VS Code (sau alt editor)
+sql folder contains:
+00_cleanup.sql
+01_schema.sql
+02_seed.sql
+03_pkg_reports.sql
+04_triggers.sql
 
-2. Copiați .env.example în .env:
-   cp .env.example .env
+app folder contains:
+app_web.py
+init_db.py
+requirements.txt
+Dockerfile
+docker-entrypoint.sh
+templates folder
 
-3. Porniți serviciile cu Docker Compose:
-   docker-compose up -d
+INSTALLATION INSTRUCTIONS
 
-   Ce se întâmplă automat:
-   - Se pornește containerul Oracle (baza de date)
-   - Se așteaptă ca Oracle să fie gata (max 4 minute)
-   - Se pornește containerul web
-   - Se rulează automat init_db.py (creează schema, pachete, date seed, trigger-e)
-   - Se pornește aplicația web cu python3 app_web.py
-   
-   Dacă doriți să rulați manual: python3 app/init_db.py && python3 app/app_web.py
+Extract the archive and open the project in VS Code (or any other editor).
 
-4. Accesați aplicația în browser:
-   http://localhost:5001
+Copy .env.example to .env using the command:
 
+cp .env.example .env
 
-Pentru oprire: docker-compose down
-Pentru restart: docker-compose restart
-Pentru loguri: docker-compose logs -f web
+Start the services using Docker Compose:
 
+docker-compose up -d
+
+What happens automatically:
+
+The Oracle database container starts.
+The system waits until Oracle is fully ready (up to 4 minutes).
+The web container starts.
+init_db.py runs automatically (creates schema, packages, seed data, and triggers).
+The web application starts using python3 app_web.py.
+
+If you want to run everything manually:
+
+python3 app/init_db.py && python3 app/app_web.py
+
+Access the application in your browser:
+
+http://localhost:5001
+
+Docker commands:
+
+Stop containers:
+docker-compose down
+
+Restart containers:
+docker-compose restart
+
+View logs:
+docker-compose logs -f web
