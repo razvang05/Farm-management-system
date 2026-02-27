@@ -2,6 +2,24 @@
 
 BD2 PROJECT - FARM MANAGEMENT SYSTEM
 
+Project Overview
+
+The Farm Management System is a database-driven web application designed to manage and monitor farm operations. The system centralizes data related to animals, crops, production activities, and farm resources, providing structured storage and automated business logic through Oracle SQL and PL/SQL.
+
+The application allows users to:
+
+Manage farm entities (such as livestock, crops, and operational records)
+
+Insert, update, and view structured data stored in an Oracle database
+
+Execute database packages and stored procedures for reporting and automation
+
+Automatically enforce business rules using database triggers
+
+Visualize and interact with data through a web-based interface
+
+The project integrates an Oracle database backend with a Python web application, all containerized using Docker Compose for easy deployment and reproducibility.
+
 PROJECT STRUCTURE
 
 documentation.pdf
