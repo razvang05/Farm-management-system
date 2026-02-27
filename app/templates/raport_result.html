@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Rezultate{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">
+                <i class="bi bi-file-earmark-check"></i> {{ title }}
+            </h2>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Înapoi
+            </a>
+        </div>
+
+        <!-- Informații raport -->
+        <div class="alert alert-info mb-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <strong><i class="bi bi-calendar"></i> Sezon:</strong> {{ an }}
+                </div>
+                <div class="col-md-4">
+                    <strong><i class="bi bi-building"></i> Fermă:</strong> {{ ferma }}
+                </div>
+                <div class="col-md-4">
+                    <strong><i class="bi bi-table"></i> Rânduri:</strong> {{ row_count }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Grafic -->
+        {% if chart_base64 %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Vizualizare Grafică</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <img src="data:image/png;base64,{{ chart_base64 }}" alt="Grafic raport" class="img-fluid">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Tabel rezultate -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-table"></i> Date Raport</h5>
+            </div>
+            <div class="card-body">
+                {% if row_count > 0 %}
+                <div class="table-container">
+                    {{ df_html|safe }}
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> Nu există date pentru parametrii selectați.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Acțiuni -->
+        <div class="mt-4 d-flex gap-2">
+            <a href="{{ url_for('raport', report_key=report_key) }}" class="btn btn-primary">
+                <i class="bi bi-arrow-clockwise"></i> Modifică Parametrii
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    #raport-table {
+        font-size: 0.9rem;
+    }
+    #raport-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        white-space: nowrap;
+        text-align: center;
+    }
+    #raport-table td {
+        vertical-align: middle;
+        text-align: center;
+    }
+</style>
+{% endblock %}

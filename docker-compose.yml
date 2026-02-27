@@ -1,0 +1,37 @@
+services:
+  oracle:
+    image: gvenzl/oracle-xe:21
+    container_name: ferma_oracle_xe
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
+      ORACLE_DATABASE: ${ORACLE_DATABASE}
+      APP_USER: ${APP_USER}
+      APP_USER_PASSWORD: ${APP_USER_PASSWORD}
+    ports:
+      - "1522:1521"
+      - "5501:5500"
+    volumes:
+      - ferma_oracle_data:/opt/oracle/oradata
+      - ./sql:/container-initdb.d
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    container_name: ferma_web
+    environment:
+      # Conexiune DB (din interiorul retelei Docker)
+      DB_HOST: oracle
+      DB_PORT: "1521"
+      DB_SERVICE: ${ORACLE_DATABASE}
+      DB_USER: ${APP_USER}
+      DB_PASS: ${APP_USER_PASSWORD}
+    depends_on:
+      - oracle
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+
+volumes:
+  ferma_oracle_data:

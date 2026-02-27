@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Formular{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="bi bi-file-earmark-text"></i> {{ title }}
+        </h2>
+        
+        <form method="POST" action="{{ url_for('raport', report_key=report_key) }}">
+            <!-- Parametri comuni -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> Parametri Comuni</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="an" class="form-label">
+                                <i class="bi bi-calendar"></i> An Sezon <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" class="form-control" id="an" name="an" 
+                                   value="2024" min="2020" max="2030" required>
+                            <small class="form-text text-muted">Anul pentru care se generează raportul</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="ferma" class="form-label">
+                                <i class="bi bi-building"></i> Fermă
+                            </label>
+                            <select class="form-select" id="ferma" name="ferma">
+                                <option value="ambele">Toate fermele</option>
+                                <option value="RODAGRO GREEN">RODAGRO GREEN</option>
+                                <option value="AgroSud">AgroSud</option>
+                            </select>
+                            <small class="form-text text-muted">Lasă "Toate fermele" pentru raport complet</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parametri specifici raportului -->
+            {% if schema|length > 0 %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-sliders"></i> Parametri Specifici</h5>
+                </div>
+                <div class="card-body">
+                    {% for pname, ptype, default, prompt in schema %}
+                    <div class="mb-3">
+                        <label for="{{ pname }}" class="form-label">
+                            {{ prompt }}
+                            {% if default is not none %}
+                                <span class="text-muted">(implicit: {{ default }})</span>
+                            {% endif %}
+                        </label>
+                        
+                        {% if ptype == "preturi_culturi" %}
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Cultură</th>
+                                            <th>Preț vânzare (lei/tonă) <span class="text-danger">*</span></th>
+                                            <th>Preț sămânță (lei/kg) <span class="text-danger">*</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for cultura in culturi %}
+                                        <tr>
+                                            <td><strong>{{ cultura }}</strong></td>
+                                            <td>
+                                                <input type="number" 
+                                                       class="form-control form-control-sm" 
+                                                       name="pret_vanzare_{{ cultura }}" 
+                                                       step="0.01" 
+                                                       min="0"
+                                                       placeholder="0.00">
+                                            </td>
+                                            <td>
+                                                <input type="number" 
+                                                       class="form-control form-control-sm" 
+                                                       name="pret_samanta_{{ cultura }}" 
+                                                       step="0.01" 
+                                                       min="0"
+                                                       placeholder="0.00">
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="bi bi-info-circle"></i> Introdu prețurile pentru fiecare cultură. Doar culturile cu prețuri completate vor apărea în raport.
+                            </small>
+                        {% elif ptype == "preturi_culturi_vanzare" %}
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-check2-square"></i> Selectează culturile pentru care vrei să introduci prețuri:
+                                </label>
+                                <div class="row">
+                                    {% for cultura in culturi %}
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input cultura-checkbox" 
+                                                   type="checkbox" 
+                                                   id="check_{{ cultura }}" 
+                                                   name="cultura_selectata_{{ cultura }}"
+                                                   value="{{ cultura }}">
+                                            <label class="form-check-label" for="check_{{ cultura }}">
+                                                <strong>{{ cultura }}</strong>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Cultură</th>
+                                            <th>Preț vânzare (lei/tonă) <span class="text-danger">*</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for cultura in culturi %}
+                                        <tr id="row_{{ cultura }}" style="display: none;">
+                                            <td><strong>{{ cultura }}</strong></td>
+                                            <td>
+                                                <input type="number" 
+                                                       class="form-control form-control-sm pret-input" 
+                                                       name="pret_vanzare_{{ cultura }}" 
+                                                       step="0.01" 
+                                                       min="0"
+                                                       placeholder="0.00"
+                                                       data-cultura="{{ cultura }}">
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="bi bi-info-circle"></i> Bifează culturile dorite mai sus, apoi introdu prețurile de vânzare în tabel. Doar culturile selectate cu preț completat vor apărea în raport.
+                            </small>
+                            <script>
+                                // Afișează/ascunde rândurile din tabel când se bifează/debifează checkbox-urile
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const checkboxes = document.querySelectorAll('.cultura-checkbox');
+                                    checkboxes.forEach(function(checkbox) {
+                                        checkbox.addEventListener('change', function() {
+                                            const cultura = this.value;
+                                            const row = document.getElementById('row_' + cultura);
+                                            if (row) {
+                                                row.style.display = this.checked ? '' : 'none';
+                                                if (!this.checked) {
+                                                    // Șterge valoarea input-ului când se debifează
+                                                    const input = row.querySelector('.pret-input');
+                                                    if (input) input.value = '';
+                                                }
+                                            }
+                                        });
+                                    });
+                                });
+                            </script>
+                        {% elif ptype == "string" and pname == "p_cultura" and culturi %}
+                            <select class="form-control" id="{{ pname }}" name="{{ pname }}" required>
+                                <option value="">-- Selectează cultura --</option>
+                                {% for cultura in culturi %}
+                                <option value="{{ cultura }}">{{ cultura }}</option>
+                                {% endfor %}
+                            </select>
+                        {% elif ptype == "string_or_none" and pname == "p_cultura" and culturi %}
+                            <select class="form-control" id="{{ pname }}" name="{{ pname }}">
+                                <option value="">-- Toate culturile --</option>
+                                {% for cultura in culturi %}
+                                <option value="{{ cultura }}">{{ cultura }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Lasă "Toate culturile" pentru analiză completă</small>
+                        {% elif ptype == "int" %}
+                            <input type="number" class="form-control" id="{{ pname }}" name="{{ pname }}" 
+                                   value="{{ default if default is not none else '' }}" 
+                                   step="1">
+                        {% elif ptype == "int_or_none" %}
+                            <input type="number" class="form-control" id="{{ pname }}" name="{{ pname }}" 
+                                   value="{{ default if default is not none else '' }}" 
+                                   step="1">
+                            <small class="form-text text-muted">Lasă gol pentru a afișa toate culturile</small>
+                        {% elif ptype == "float" or ptype == "float_or_none" %}
+                            <input type="number" class="form-control" id="{{ pname }}" name="{{ pname }}" 
+                                   value="{{ default if default is not none else '' }}" 
+                                   step="0.01">
+                            {% if ptype == "float_or_none" %}
+                                <small class="form-text text-muted">Lasă gol sau scrie "none" pentru a ignora acest parametru</small>
+                            {% endif %}
+                        {% else %}
+                            <input type="text" class="form-control" id="{{ pname }}" name="{{ pname }}" 
+                                   value="{{ default if default is not none else '' }}">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Butoane -->
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="bi bi-play-circle"></i> Generează Raport
+                </button>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-arrow-left"></i> Înapoi la Meniu
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

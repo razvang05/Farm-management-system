@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Meniu Rapoarte - Sistem Fermă{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="bi bi-list-ul"></i> Rapoarte Disponibile
+        </h2>
+        <p class="text-muted">Selectează un raport pentru a genera analiza detaliată.</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for key, (title, proc, schema) in reports.items() %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card report-card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <span class="badge bg-primary me-2">{{ key }}</span>
+                    {{ title }}
+                </h5>
+                <p class="card-text text-muted small">
+                    {% if schema|length > 0 %}
+                        <i class="bi bi-sliders"></i> {{ schema|length }} parametri configurabili
+                    {% else %}
+                        <i class="bi bi-check-circle"></i> Fără parametri suplimentari
+                    {% endif %}
+                </p>
+                <a href="{{ url_for('raport', report_key=key) }}" class="btn btn-primary btn-report">
+                    <i class="bi bi-play-circle"></i> Generează Raport
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h5><i class="bi bi-info-circle"></i> Informații</h5>
+            <ul class="mb-0">
+                <li>Toate rapoartele necesită selectarea <strong>anului sezonului</strong> și opțional a <strong>fermei</strong></li>
+                <li>Fiecare raport poate avea parametri suplimentari configurabili</li>
+                <li>Rezultatele pot fi exportate și vizualizate în grafice</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
